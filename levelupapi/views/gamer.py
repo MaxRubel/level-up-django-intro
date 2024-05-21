@@ -39,3 +39,17 @@ class GamerView(ViewSet):
         game_types = Gamer.objects.all()
         serializer = GamerSerializer(game_types, many=True)
         return Response(serializer.data)
+    
+    def create(self, request):
+        """Handle POST operations
+
+        Returns
+            Response -- JSON serialized game instance
+        """
+
+        gamer = Gamer.objects.create(
+            uid = request.data["uid"],
+            bio = request.data["bio"]
+        )
+        serializer = GamerSerializer(gamer)
+        return Response(serializer.data)
