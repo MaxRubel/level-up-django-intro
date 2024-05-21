@@ -1,4 +1,4 @@
 from django.db import models
 
-class Game_type(models.Model):
+class GameType(models.Model):
     label = models.CharField(max_length=75)
