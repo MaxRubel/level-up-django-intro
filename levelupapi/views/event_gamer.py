@@ -3,13 +3,13 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from levelupapi.models import Event_gamer
+from levelupapi.models import EventGamer
 
 class EventGamerSerializer(serializers.ModelSerializer):
     """JSON serializer for game types
     """
     class Meta:
-        model = Event_gamer
+        model = EventGamer
         fields = ('id', 'label')
 
 class EventGamerView(ViewSet):
@@ -22,10 +22,10 @@ class EventGamerView(ViewSet):
             Response -- JSON serialized game type
         """
         try:
-            event_gamer = Event_gamer.objects.get(pk=pk)
+            event_gamer = EventGamer.objects.get(pk=pk)
             serializer = EventGamerSerializer(event_gamer)
             return Response(serializer.data)
-        except Event_gamer.DoesNotExist as ex:
+        except EventGamer.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -36,6 +36,6 @@ class EventGamerView(ViewSet):
             Response -- JSON serialized list of game types
         """
         
-        event_gamers = Event_gamer.objects.all()
+        event_gamers = EventGamer.objects.all()
         serializer = EventGamerSerializer(event_gamers, many=True)
         return Response(serializer.data)
