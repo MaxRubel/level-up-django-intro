@@ -10,7 +10,7 @@ class GameSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Game
-        fields = ('game_type', 'title', 'maker', 'gamer', 'number_of_players', 'skill_level')
+        fields = ('id','game_type', 'title', 'maker', 'gamer', 'number_of_players', 'skill_level')
         depth = 1
 
 class GameView(ViewSet):
@@ -37,9 +37,6 @@ class GameView(ViewSet):
         """
         
         games = Game.objects.all()
-        
-        games = Game.objects.all()
-
 
         game_type = request.query_params.get('type', None)
         if game_type is not None:
