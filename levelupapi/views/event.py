@@ -11,7 +11,7 @@ class EventSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Event
-        fields = ('id','game', 'description', 'date', 'time', 'organizer', 'attendees')
+        fields = ('id','game', 'description', 'date', 'time', 'organizer', 'joined')
         depth = 1
 
 class EventView(ViewSet):
@@ -40,6 +40,12 @@ class EventView(ViewSet):
         """
         
         events = Event.objects.all()
+        uid = request.META['HTTP_AUTHORIZATION']
+        gamer = Gamer.objects.get(uid=uid)
+
+        for event in events:
+            event.joined = len(EventGamer.objects.filter(
+                gamer=gamer, event=event)) > 0
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
