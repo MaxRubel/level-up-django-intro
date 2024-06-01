@@ -4,23 +4,27 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
 from levelupapi.models import Game, Gamer, GameType
+from django.db.models import Count
 
 class GameSerializer(serializers.ModelSerializer):
-    """JSON serializer for game types
+    """JSON serializer for games
     """
+
+    event_count = serializers.IntegerField(default=None)
+
     class Meta:
         model = Game
-        fields = ('id','game_type', 'title', 'maker', 'gamer', 'number_of_players', 'skill_level')
+        fields = ('id','game_type', 'title', 'maker', 'gamer', 'number_of_players', 'skill_level', 'event_count')
         depth = 1
 
 class GameView(ViewSet):
     """Level up game types view"""
 
     def retrieve(self, request, pk):
-        """Handle GET requests for single game type
+        """Handle GET requests for single game
 
         Returns:
-            Response -- JSON serialized game type
+            Response -- JSON serialized game
         """
         try:
             game = Game.objects.get(pk=pk)
@@ -30,13 +34,13 @@ class GameView(ViewSet):
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
     def list(self, request):
-        """Handle GET requests to get all game types
+        """Handle GET requests to get all game
 
         Returns:
-            Response -- JSON serialized list of game types
+            Response -- JSON serialized list of games
         """
         
-        games = Game.objects.all()
+        games = Game.objects.annotate(event_count=Count('events'))
 
         game_type = request.query_params.get('type', None)
         if game_type is not None:
