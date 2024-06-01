@@ -5,20 +5,24 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 from levelupapi.models import Event, Gamer, Game, EventGamer
 from rest_framework.decorators import action
+from django.db.models import Count
 
 class EventSerializer(serializers.ModelSerializer):
-    """JSON serializer for game types
+    """JSON serializer for events
     """
+
+    attendees_count = serializers.IntegerField(default=None)
+
     class Meta:
         model = Event
-        fields = ('id','game', 'description', 'date', 'time', 'organizer', 'joined')
+        fields = ('id','game', 'description', 'date', 'time', 'organizer', 'joined', 'attendees_count')
         depth = 1
 
 class EventView(ViewSet):
-    """Level up game types view"""
+    """Level up events view"""
 
     def retrieve(self, request, pk):
-        """Handle GET requests for single game type
+        """Handle GET requests for event
 
         Returns:
             Response -- JSON serialized game type
@@ -33,19 +37,19 @@ class EventView(ViewSet):
 
 
     def list(self, request):
-        """Handle GET requests to get all game types
+        """Handle GET requests to get all events
 
         Returns:
-            Response -- JSON serialized list of game types
+            Response -- JSON serialized list of events
         """
-        
-        events = Event.objects.all()
+        events = Event.objects.annotate(attendees_count=Count('attendees'))
         uid = request.META['HTTP_AUTHORIZATION']
         gamer = Gamer.objects.get(uid=uid)
 
         for event in events:
             event.joined = len(EventGamer.objects.filter(
                 gamer=gamer, event=event)) > 0
+
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
