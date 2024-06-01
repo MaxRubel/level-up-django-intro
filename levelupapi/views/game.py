@@ -28,6 +28,8 @@ class GameView(ViewSet):
         """
         try:
             game = Game.objects.get(pk=pk)
+            event_count = Game.objects.annotate(event_count=Count('events')).first().event_count
+            game.event_count = event_count
             serializer = GameSerializer(game)
             return Response(serializer.data)
         except Game.DoesNotExist as ex:
@@ -57,6 +59,7 @@ class GameView(ViewSet):
         """
         gamer = Gamer.objects.get(uid=request.data["userId"])
         game_type = GameType.objects.get(pk=request.data["gameType"])
+    
 
         game = Game.objects.create(
             title=request.data["title"],
@@ -66,6 +69,7 @@ class GameView(ViewSet):
             game_type=game_type,
             gamer=gamer,
         )
+    
         serializer = GameSerializer(game)
         return Response(serializer.data)
     
