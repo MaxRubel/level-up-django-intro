@@ -7,7 +7,7 @@ from levelupapi.views.game import GameSerializer
 class GameTests(APITestCase):
 
     # Add any fixtures you want to run to build the test database
-    fixtures = ['gamers', 'game_types',]
+    fixtures = ['gamers', 'game_types', ]
     
     def setUp(self):
         # Grab the first Gamer object from the database
@@ -26,7 +26,7 @@ class GameTests(APITestCase):
             "skillLevel": 5,
             "numberOfPlayers": 6,
             "gameType": 1,
-            "userId": 1
+            "userId": "{The uid of the first gamer object in your fixtures}"
         }
 
         response = self.client.post(url, game, format='json')
@@ -37,7 +37,7 @@ class GameTests(APITestCase):
 
         # Since the create method should return the serialized version of the newly created game,
         # Use the serializer you're using in the create method to serialize the "new_game"
-        # Depending on your code this might be different
+        # Depending on your code this might be diffe rent
         expected = GameSerializer(new_game)
 
         # Now we can test that the expected ouput matches what was actually returned
