@@ -29,6 +29,7 @@ class EventView(ViewSet):
         """
         try:
             event = Event.objects.get(pk=pk)
+            event.attendees_count = Event.objects.filter(pk=pk).annotate(attendees_count=Count('attendees')).first().attendees_count
             serializer = EventSerializer(event)
             return Response(serializer.data)
         except Event.DoesNotExist as ex:
