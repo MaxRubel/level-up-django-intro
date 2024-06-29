@@ -10,12 +10,17 @@ class GameSerializer(serializers.ModelSerializer):
     """JSON serializer for games
     """
 
-    event_count = serializers.IntegerField(default=None)
+class GameSerializer(serializers.ModelSerializer):
+    event_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
-        fields = ('id','game_type', 'title', 'maker', 'gamer', 'number_of_players', 'skill_level', 'event_count')
-        depth = 1
+        fields = ['id', 'title', 'maker', 'number_of_players', 'skill_level', 'game_type', 'gamer', 'event_count']
+
+    def get_event_count(self, obj):
+        if hasattr(obj, 'event_count'):
+            return obj.event_count or None
+        return None
 
 class GameView(ViewSet):
     """Level up game types view"""

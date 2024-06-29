@@ -10,7 +10,7 @@ class GamerSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Gamer
-        fields = ('uid', 'bio')
+        fields = ('id','uid', 'bio')
 
 class GamerView(ViewSet):
     """Level up game types view"""
@@ -28,6 +28,19 @@ class GamerView(ViewSet):
         except Gamer.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
+    def update(self, request, pk):
+        """Handle PUT requests for a game
+
+        Returns:
+            Response -- Empty body with 204 status code
+        """
+
+        gamer = Gamer.objects.get(pk=pk)
+        gamer.uid=request.data["uid"]
+        gamer.bio=request.data["bio"]
+        gamer.save()
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
     def list(self, request):
         """Handle GET requests to get all game types
@@ -53,3 +66,8 @@ class GamerView(ViewSet):
         )
         serializer = GamerSerializer(gamer)
         return Response(serializer.data)
+
+    def destroy(self, request, pk):
+        gamer = Gamer.objects.get(pk=pk)
+        gamer.delete()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)

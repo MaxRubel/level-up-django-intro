@@ -8,15 +8,22 @@ from rest_framework.decorators import action
 from django.db.models import Count
 
 class EventSerializer(serializers.ModelSerializer):
-    """JSON serializer for events
-    """
-
-    attendees_count = serializers.IntegerField(default=None)
+    attendees_count = serializers.SerializerMethodField()
+    joined = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
-        fields = ('id','game', 'description', 'date', 'time', 'organizer', 'joined', 'attendees_count')
-        depth = 1
+        fields = '__all__'
+
+    def get_attendees_count(self, obj):
+        return obj.attendees.count()
+
+    def get_joined(self, obj):
+        request = self.context.get('request')
+        if request:
+            user = request.user
+            return user in obj.attendees.all()
+        return False
 
 class EventView(ViewSet):
     """Level up events view"""
